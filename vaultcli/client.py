@@ -24,11 +24,14 @@ import requests
 
 class Client(object):
     """Base class for Vaultier API access"""
-    def __init__(self, server, token, key=None, verify=True):
+    def __init__(self, server, token, key=None, verify=True,
+                 http_user=None, http_password=None):
         self.server = server
         self.token = token
         self.key = key
         self.verify = verify
+        self.http_user = http_user
+        self.http_password = http_password
 
     def list_workspaces(self):
         """
@@ -394,7 +397,10 @@ class Client(object):
 
         """Perform the HTTP request"""
         try:
-            response = requests.request(http_method, url, params=params, headers=headers, data=data, files=files, verify=self.verify)
+            auth = None
+            if self.http_user:
+                auth = (self.http_user, self.http_password)
+            response = requests.request(http_method, url, params=params, headers=headers, data=data, files=files, verify=self.verify, auth=auth)
         except requests.exceptions.SSLError as e:
             raise SystemExit(e)
 

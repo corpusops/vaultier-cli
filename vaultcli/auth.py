@@ -19,11 +19,14 @@ import requests
 
 class Auth(object):
     """Base class for get Vaultier auth token"""
-    def __init__(self, server, email, key, verify=True):
+    def __init__(self, server, email, key, verify=True,
+                 http_user=None, http_password=None):
         self.server = server
         self.email = email
         self.key = key
         self.verify = verify
+        self.http_user = http_user
+        self.http_password = http_password
 
     def get_token(self):
         """
@@ -49,7 +52,10 @@ class Auth(object):
 
         """Perform the HTTP request"""
         try:
-            response = requests.request(http_method, url, params=params, headers=headers, data=data, files=files, verify=self.verify)
+            auth = None
+            if self.http_user:
+                auth = (self.http_user, self.http_password)
+            response = requests.request(http_method, url, params=params, headers=headers, data=data, files=files, verify=self.verify, auth=auth)
         except requests.exceptions.SSLError as e:
             err = 'SSL certificate error: {}'.format(e)
             raise SystemExit(err)
