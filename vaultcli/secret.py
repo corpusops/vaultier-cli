@@ -11,7 +11,7 @@ class Secret(object):
     """
     Class representing a Card
     """
-    def __init__(self, id, type, name, data, blobMeta, card, workspaceKey=None):
+    def __init__(self, id, type, name, data, blobMeta, card, creator, workspaceKey=None):
         self.id = id
         self.type = type
         self.name = name
@@ -19,7 +19,8 @@ class Secret(object):
         self.blobMeta = blobMeta
         self.card = card
         self.workspaceKey = workspaceKey
+        self.creator = creator
 
     def from_json(json_obj):
-        secret = Secret(json_obj['id'], json_obj['type'], json_obj['name'], json_obj['data'], json_obj['blob_meta'], json_obj['card'])
+        secret = Secret(json_obj['id'], json_obj['type'], json_obj['name'], json_obj['data'], json_obj['blob_meta'], json_obj['card'], json_obj['created_by']['email'])
         return secret

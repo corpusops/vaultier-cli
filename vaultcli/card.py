@@ -11,13 +11,14 @@ class Card(object):
     """
     Class representing a Card
     """
-    def __init__(self, id, slug, name, description, vault):
+    def __init__(self, id, slug, name, description, vault, creator):
         self.id = id
         self.slug = slug
         self.name = name
         self.description = description
         self.vault = vault
+        self.creator = creator
 
     def from_json(json_obj):
-        card = Card(json_obj['id'], json_obj['slug'], json_obj['name'], json_obj['description'], json_obj['vault'])
+        card = Card(json_obj['id'], json_obj['slug'], json_obj['name'], json_obj['description'], json_obj['vault'], json_obj['created_by']['email'])
         return card

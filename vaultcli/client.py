@@ -19,8 +19,10 @@ from os.path import basename
 from mimetypes import MimeTypes
 from functools import lru_cache
 
+import os
 import json
 import requests
+import re
 
 class Client(object):
     """Base class for Vaultier API access"""
@@ -48,7 +50,7 @@ class Client(object):
             - workspaceKey: workspace key
         """
         json_obj = self.fetch_json('/api/workspaces')
-        return [Workspace.from_json(obj) for obj in json_obj]
+        return [self.add_acls(Workspace.from_json(obj)) for obj in json_obj]
 
     def list_vaults(self, workspace_id):
         """
@@ -67,7 +69,21 @@ class Client(object):
             - workspace: workspace that contains this vault
         """
         json_obj = self.fetch_json('/api/vaults/?workspace={}'.format(workspace_id))
-        return [Vault.from_json(obj) for obj in json_obj]
+        return [self.add_acls(Vault.from_json(obj)) for obj in json_obj]
+
+    def add_acls(self, obj):
+        tp = obj.__class__.__name__.lower()
+        acls_json = self.fetch_json(f'/api/roles/?to_{tp}={obj.id}')
+        acls = {}
+        for idata in acls_json:
+            m = idata['member']['email']
+            ufilter = os.environ.get('ACLS_USERS_FILTER', '')
+            if ufilter and not re.search(ufilter, m):
+                continue
+            acls[m] = idata['level']
+        obj.acls = acls
+        return obj
+
 
     def list_cards(self, vault_id):
         """
@@ -85,7 +101,7 @@ class Client(object):
             - vault: vault that contains this card
         """
         json_obj = self.fetch_json('/api/cards/?vault={}'.format(vault_id))
-        return [Card.from_json(obj) for obj in json_obj]
+        return [self.add_acls(Card.from_json(obj)) for obj in json_obj]
 
     def list_secrets(self, card_id):
         """

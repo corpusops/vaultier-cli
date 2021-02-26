@@ -11,13 +11,14 @@ class Workspace(object):
     """
     Class representing a Workspace
     """
-    def __init__(self, id, slug, name, description, workspaceKey):
+    def __init__(self, id, slug, name, description, workspaceKey, creator):
         self.id = id
         self.slug = slug
         self.name = name
         self.description = description
         self.workspaceKey = workspaceKey
+        self.creator = creator
 
     def from_json(json_obj):
-        workspace = Workspace(json_obj['id'], json_obj['slug'], json_obj['name'], json_obj['description'], json_obj['membership']['workspace_key'])
+        workspace = Workspace(json_obj['id'], json_obj['slug'], json_obj['name'], json_obj['description'], json_obj['membership']['workspace_key'], json_obj['created_by']['email'])
         return workspace
