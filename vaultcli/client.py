@@ -138,7 +138,7 @@ class Client(object):
             - workspaceKey: workspace key
         """
         json_obj = self.fetch_json('/api/workspaces/{}/'.format(workspace_id))
-        return Workspace.from_json(json_obj)
+        return self.add_acls(Workspace.from_json(json_obj))
 
     def get_secret(self, secret_id):
         """
